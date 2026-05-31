@@ -5,28 +5,25 @@ export default function App() {
   const [Name, UpdatedName] = useState("");
   const [UserData, SetUserData] = useState(null);
   const [Error, SetError] = useState("");
-
-  async function searchUser() {
-    try {
-      SetError("");
-      SetUserData(null);
-
-      const response = await fetch(
-        `https://api.github.com/users/${Name}`
-      );
-
-      if (!response.ok) {
-        throw new Error("User not found");
-      }
-
-      const data = await response.json();
-      SetUserData(data);
-
-    } catch (error) {
-      SetError(error.message);
-      SetUserData(null);
+  useEffect(() => {
+    if (Name) {
+      fetch(`https://api.github.com/users/${Name}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("User not found");
+          }
+          return response.json();
+        })
+        .then(data => {
+          SetUserData(data);
+          SetError("");
+        })
+        .catch(error => {
+          SetError(error.message);
+          SetUserData(null);
+        });
     }
-  }
+  }, [Name]);
 
   return (
     <>
